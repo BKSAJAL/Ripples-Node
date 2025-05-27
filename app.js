@@ -1,9 +1,11 @@
 import express from "express";
-import productRoutes from "./Routes/products.routes.js";
-import cartRoutes from "./Routes/cart.routes.js";
+import videoRoutes from "./Routes/video.routes.js";
+import commentRoutes from "./Routes/comment.routes.js";
 import userRoutes from "./Routes/user.routes.js";
+import channelRoutes from "./Routes/channel.routes.js";
 import compression from "compression";
 import helmet from "helmet";
+import cors from "cors";
 
 const app = express();
 
@@ -13,17 +15,23 @@ app.use(express.json());
 // gzip compression
 app.use(compression());
 
+//Allow cors policy
+app.use(cors());
+
 // set security HTTP headers
 app.use(helmet());
 
 //products routes
-app.use("/v1/products", productRoutes);
+app.use("/api/v1/videos", videoRoutes);
 
 //cart routes
-app.use("/v1/cart", cartRoutes);
+app.use("/api/v1/comment", commentRoutes);
 
 //user routes
-app.use("/v1/user", userRoutes);
+app.use("/api/v1/user", userRoutes);
+
+//channel routes
+app.use("/api/v1/channel", channelRoutes);
 
 //handle invalid route
 app.use((req, res, next) => {

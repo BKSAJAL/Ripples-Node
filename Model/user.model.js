@@ -7,10 +7,17 @@ const userSchema = mongoose.Schema(
       required: [true, "Username is required"],
       unique: [true, "Username should be unique"],
     },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: [true, "Email should be unique"],
+    },
     password: {
       type: String,
       required: [true, "Password is required"],
     },
+    // avatar: String,
+    channels: [String],
   },
   { versionKey: false }
 );

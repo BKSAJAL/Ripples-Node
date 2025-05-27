@@ -9,15 +9,23 @@ const JWT_SECRET = process.env.JWT_SECRET;
 //Register new user
 export const register = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
     const existingUser = await userModel.findOne({ username });
     if (existingUser)
-      return res.status(400).json({ error: "User already exist" });
+      return res.status(409).json({ error: "User already exist" });
+
+    const existingEmail = await userModel.findOne({ email });
+    if (existingEmail)
+      return res.status(409).json({ error: "Email already exist" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new userModel({ username, password: hashedPassword });
+    const newUser = new userModel({
+      username,
+      email,
+      password: hashedPassword,
+    });
     await newUser.save();
-    res.status(201).json({ message: "User registered successfully" });
+    res.status(201).json({ message: "Your are registered successfully" });
   } catch (err) {
     if (err.name === "ValidationError")
       return res.status(400).json({ error: err.message });
@@ -28,9 +36,11 @@ export const register = async (req, res) => {
 //Authenticate User
 export const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
     const user = await userModel.findOne({ username });
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+
+    if (!user || user.email !== email)
+      return res.status(401).json({ error: "Invalid credentials" });
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
@@ -39,7 +49,12 @@ export const login = async (req, res) => {
       JWT_SECRET,
       { expiresIn: "1h" }
     );
-    res.status(200).json({ token });
+    res.status(200).json({
+      username,
+      channels: user.channels,
+      token,
+      message: "Your are logged in successfully",
+    });
   } catch (err) {
     if (err.name === "ValidationError")
       return res.status(400).json({ error: err.message });
