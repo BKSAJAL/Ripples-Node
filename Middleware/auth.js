@@ -9,10 +9,21 @@ function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1]; // Bearer <token>
 
-  if (!token) return res.status(401).json({ error: "No token provided" });
+  if (!token)
+    return res.status(401).json({
+      success: false,
+      message: "Authentication required",
+    });
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: "Invalid or expired token" });
+    if (err) {
+      const isExpired = err.name === "TokenExpiredError";
+
+      return res.status(403).json({
+        success: false,
+        message: isExpired ? "Token expired" : "Invalid token",
+      });
+    }
     req.user = user;
     next();
   });

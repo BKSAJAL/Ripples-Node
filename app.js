@@ -1,8 +1,7 @@
 import express from "express";
-import videoRoutes from "./Routes/video.routes.js";
-import commentRoutes from "./Routes/comment.routes.js";
 import userRoutes from "./Routes/user.routes.js";
-import channelRoutes from "./Routes/channel.routes.js";
+import surveyRoutes from "./Routes/survey.routes.js";
+import respondentRoutes from "./Routes/respondent.routes.js";
 import compression from "compression";
 import helmet from "helmet";
 import cors from "cors";
@@ -16,22 +15,24 @@ app.use(express.json());
 app.use(compression());
 
 //Allow cors policy
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "https://your-frontend-domain.com"],
+    credentials: true,
+  })
+);
 
 // set security HTTP headers
 app.use(helmet());
 
-//products routes
-app.use("/api/v1/videos", videoRoutes);
-
-//cart routes
-app.use("/api/v1/comment", commentRoutes);
-
 //user routes
-app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/auth", userRoutes);
 
-//channel routes
-app.use("/api/v1/channel", channelRoutes);
+//survey routes
+app.use("/api/v1/surveys", surveyRoutes);
+
+//respondent routes
+app.use("/api/v1/respondents", respondentRoutes);
 
 //handle invalid route
 app.use((req, res, next) => {

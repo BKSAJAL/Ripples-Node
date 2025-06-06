@@ -1,26 +1,44 @@
 import mongoose from "mongoose";
 
-const userSchema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
-    username: {
-      type: String,
-      required: [true, "Username is required"],
-      unique: [true, "Username should be unique"],
-    },
     email: {
       type: String,
-      required: [true, "Email is required"],
-      unique: [true, "Email should be unique"],
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: true,
     },
-    // avatar: String,
-    channels: [String],
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    is_active: {
+      type: Boolean,
+      default: true,
+    },
   },
-  { versionKey: false }
+  {
+    timestamps: {
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
+  }
 );
 
-const userModel = mongoose.model("User", userSchema);
-export default userModel;
+userSchema.virtual("id").get(function () {
+  return this._id.toHexString();
+});
+
+userSchema.set("toJSON", {
+  virtuals: true,
+});
+
+const User = mongoose.model("User", userSchema);
+
+export default User;
